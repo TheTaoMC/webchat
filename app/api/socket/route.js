@@ -1,10 +1,6 @@
 import { Server } from 'socket.io';
 
-export const config = {
-  api: {
-    bodyParser: false
-  }
-};
+export const dynamic = 'force-dynamic';
 
 export default function handler(req, res) {
   if (!res.socket.server.io) {
