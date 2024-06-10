@@ -33,7 +33,6 @@ export default function Home() {
 
   return (
     <div>
-      v0.0.1
       <ul>
         {messages.map((msg, index) => (
           <li key={index}>{msg}</li>

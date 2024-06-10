@@ -1,9 +1,11 @@
 import { Server } from 'socket.io';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 export const dynamic = 'force-dynamic';
 
-export default function handler(req, res) {
+const ioHandler = (req, res) => {
   if (!res.socket.server.io) {
+    console.log('New Socket.io server...');
     const io = new Server(res.socket.server);
     res.socket.server.io = io;
 
@@ -16,6 +18,10 @@ export default function handler(req, res) {
         io.emit('chat message', msg);
       });
     });
+  } else {
+    console.log('Socket.io server already running...');
   }
   res.end();
-}
+};
+
+export default ioHandler;
