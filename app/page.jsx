@@ -31,6 +31,7 @@ export default function Home() {
 
   return (
     <div>
+      <h1>ChatChat v0.0.1</h1>
       <ul>
         {messages.map((msg, index) => (
           <li key={index}>{msg}</li>
