@@ -10,6 +10,8 @@ export default function Home() {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
+    fetch('/api/socket'); // initialize socket.io server
+
     socket = io();
 
     socket.on('chat message', (msg) => {
@@ -31,7 +33,7 @@ export default function Home() {
 
   return (
     <div>
-            <h1>ChatChat v0.0.1</h1>
+      v0.0.1
       <ul>
         {messages.map((msg, index) => (
           <li key={index}>{msg}</li>
