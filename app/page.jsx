@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import io from 'socket.io-client';
 
 let socket;
 
@@ -10,23 +9,21 @@ export default function Home() {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    fetch('/api/socket'); // initialize socket.io server
+    socket = new WebSocket('ws://localhost:3000/api/websocket');
 
-    socket = io();
-
-    socket.on('chat message', (msg) => {
-      setMessages((prevMessages) => [...prevMessages, msg]);
-    });
+    socket.onmessage = (event) => {
+      setMessages((prevMessages) => [...prevMessages, event.data]);
+    };
 
     return () => {
-      socket.off('chat message');
+      socket.close();
     };
   }, []);
 
   const sendMessage = (e) => {
     e.preventDefault();
     if (message) {
-      socket.emit('chat message', message);
+      socket.send(message);
       setMessage('');
     }
   };

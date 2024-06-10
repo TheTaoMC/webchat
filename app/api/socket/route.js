@@ -1,27 +1,35 @@
-import { Server } from 'socket.io';
-import { NextApiRequest, NextApiResponse } from 'next';
+import { WebSocketServer } from 'ws';
 
-export const dynamic = 'force-dynamic';
-
-const ioHandler = (req, res) => {
-  if (!res.socket.server.io) {
-    console.log('New Socket.io server...');
-    const io = new Server(res.socket.server);
-    res.socket.server.io = io;
-
-    io.on('connection', (socket) => {
-      console.log('a user connected');
-      socket.on('disconnect', () => {
-        console.log('user disconnected');
-      });
-      socket.on('chat message', (msg) => {
-        io.emit('chat message', msg);
-      });
-    });
-  } else {
-    console.log('Socket.io server already running...');
+export const config = {
+  api: {
+    bodyParser: false
   }
-  res.end();
 };
 
-export default ioHandler;
+export default function handler(req, res) {
+  if (!res.socket.server.wss) {
+    console.log('Initializing WebSocket server...');
+    const wss = new WebSocketServer({ noServer: true });
+
+    res.socket.server.on('upgrade', (req, socket, head) => {
+      wss.handleUpgrade(req, socket, head, (ws) => {
+        wss.emit('connection', ws, req);
+      });
+    });
+
+    wss.on('connection', (ws) => {
+      ws.on('message', (message) => {
+        wss.clients.forEach((client) => {
+          if (client.readyState === 1) {
+            client.send(message);
+          }
+        });
+      });
+    });
+
+    res.socket.server.wss = wss;
+  } else {
+    console.log('WebSocket server already initialized.');
+  }
+  res.end();
+}
